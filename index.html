@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdminPanel Domain အသစ် ထပ်ထည့်နည်း Guide</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern Dark Theme Variables */
+        :root {
+            --bg-body: #050505;
+            --bg-card: rgba(20, 20, 20, 0.6);
+            --bg-input: #0a0a0a;
+            --bg-cmd: #000000;
+            --bg-cmd-header: #111111;
+            
+            --border-color: #2a2a2a;
+            --border-glow: rgba(0, 242, 254, 0.3);
+            
+            --text-main: #ededed;
+            --text-muted: #a1a1aa;
+            
+            --accent-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            --accent-cyan: #00f2fe;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            
+            --font-code: 'JetBrains Mono', monospace;
+            --font-text: 'Inter', 'Padauk', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 242, 254, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+            color: var(--text-main);
+            font-family: var(--font-text);
+            line-height: 1.8;
+            padding-bottom: 100px;
+        }
+
+        /* Hero Header */
+        header {
+            text-align: center;
+            padding: 4.5rem 1rem 3.5rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(12px);
+            margin-bottom: 3rem;
+        }
+
+        .logo-icon {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.4));
+        }
+
+        header h1 { 
+            font-size: 2.1rem; 
+            letter-spacing: -0.5px; 
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        
+        header p { 
+            color: var(--text-muted); 
+            font-size: 1.05rem; 
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Layout Container */
+        .page-wrapper {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Smart Input Panel (Glassmorphism) */
+        .config-panel {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 45px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .config-panel:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .config-panel h3 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .config-panel h3 i { color: var(--accent-cyan); }
+
+        .domain-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 28px;
+            margin-top: 22px;
+        }
+
+        .domain-group-card {
+            background: rgba(10, 10, 10, 0.65);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .domain-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .domain-group-header h4 {
+            font-size: 0.95rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-old { color: var(--accent-orange); }
+        .badge-new { color: var(--accent-green); }
+
+        .dynamic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .domain-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+
+        .domain-input-row .index-tag {
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.05);
+            padding: 6px 9px;
+            border-radius: 6px;
+            min-width: 32px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .domain-input-row input {
+            flex-grow: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            font-family: var(--font-code);
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.25s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .input-old { color: var(--accent-orange); }
+        .input-old:focus {
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 0 1px var(--accent-orange), inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .input-new { color: var(--accent-green); }
+        .input-new:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 1px var(--accent-green), inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-remove {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-remove:hover:not(:disabled) {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn-remove:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+        }
+
+        .btn-add-domain {
+            width: 100%;
+            background: rgba(0, 242, 254, 0.07);
+            color: var(--accent-cyan);
+            border: 1px dashed rgba(0, 242, 254, 0.35);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: var(--font-text);
+        }
+
+        .btn-add-domain:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn-add-domain.new-btn {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-add-domain.new-btn:hover {
+            background: rgba(16, 185, 129, 0.16);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .helper-note {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .section-header {
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section-header h2 {
+            font-size: 1.25rem;
+            color: #ffffff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            padding: 2px 10px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Mac-Style Terminal Box */
+        .cmd-box {
+            background: var(--bg-cmd);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .cmd-box-header {
+            background: var(--bg-cmd-header);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .cmd-title {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: var(--font-code);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .btn-copy-all {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-copy-all:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .cmd-list { display: flex; flex-direction: column; }
+        .cmd-item {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .cmd-item:last-child { border-bottom: none; }
+        .cmd-item:hover { background: rgba(255,255,255,0.03); }
+        
+        .cmd-code {
+            flex-grow: 1;
+            padding: 16px 20px;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.6;
+        }
+        
+        .btn-copy-line {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            width: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            opacity: 0;
+            flex-shrink: 0;
+        }
+        
+        .cmd-item:hover .btn-copy-line { opacity: 1; }
+        .btn-copy-line:hover { color: var(--accent-cyan); background: rgba(255,255,255,0.05); }
+        .copied { color: var(--accent-green) !important; font-weight: bold; opacity: 1 !important; }
+
+        /* Dynamic Variable Highlighting */
+        .dyn-old { 
+            color: var(--accent-orange); 
+            font-weight: 600; 
+            text-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+        }
+        .dyn-new { 
+            color: var(--accent-green); 
+            font-weight: 600; 
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .cmd-title { display: none; }
+            .btn-copy-line { opacity: 1; }
+            .domain-columns { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-icon"><i class="fas fa-server"></i> <i class="fas fa-network-wired"></i></div>
+        <h1>AdminPanel Domain အသစ် ထပ်ထည့်နည်း</h1>
+        <p>Nginx Configuration &bull; Multi-Subdomain Auto Command Generator</p>
+    </header>
+
+    <div class="page-wrapper">
+        
+        <!-- Smart Multi-Domain Auto Configurator -->
+        <div class="config-panel">
+            <h3><i class="fas fa-sliders-h"></i> Domain Auto Configurator</h3>
+            <p style="font-size:0.9rem; color: var(--text-muted);">
+                အောက်တွင် လက်ရှိအသုံးပြုနေသော Domain အဟောင်းများနှင့် ထပ်ထည့်လိုသော Sub Domain အသစ်များကို အနည်းဆုံး (၁) ခုမှစ၍ စိတ်ကြိုက် ထပ်တိုး/ပြင်ဆင်နိုင်ပါသည်။ ရိုက်ထည့်လိုက်သည်နှင့် အောက်ပါ Command များအားလုံး အလိုအလျောက် ပြောင်းလဲသွားပါမည်။
+            </p>
+            
+            <div class="domain-columns">
+                <!-- Old Domains Column -->
+                <div class="domain-group-card">
+                    <div class="domain-group-header">
+                        <h4><i class="fas fa-history badge-old"></i> လက်ရှိ Domain အဟောင်းများ (Old Domains)</h4>
+                    </div>
+                    <div id="old-domains-list" class="dynamic-list"></div>
+                    <button type="button" class="btn-add-domain" onclick="addDomain('old')">
+                        <i class="fas fa-plus-circle"></i> Add Old Domain +
+                    </button>
+                    <p class="helper-note">
+                        <i class="fas fa-info-circle" style="color: var(--accent-orange);"></i> 
+                        ပထမဆုံး Domain အဟောင်း (<code>#1</code>) ကို Nginx config ဖိုင်အမည် (<code>/etc/nginx/sites-available/...</code>) အဖြစ် အသုံးပြုပါမည်။
+                    </p>
+                </div>
+
+                <!-- New Domains Column -->
+                <div class="domain-group-card">
+                    <div class="domain-group-header">
+                        <h4><i class="fas fa-sparkles badge-new"></i> ထပ်ထည့်မည့် Domain အသစ်များ (New Sub Domains)</h4>
+                    </div>
+                    <div id="new-domains-list" class="dynamic-list"></div>
+                    <button type="button" class="btn-add-domain new-btn" onclick="addDomain('new')">
+                        <i class="fas fa-plus-circle"></i> Add New Sub Domain +
+                    </button>
+                    <p class="helper-note">
+                        <i class="fas fa-check-circle" style="color: var(--accent-green);"></i> 
+                        ထပ်ထည့်ထားသမျှ Domain အသစ်အားလုံးအတွက် <code>ping</code>, <code>sed</code> နှင့် <code>curl</code> command များ အလိုအလျောက် တန်းစီထွက်လာပါမည်။
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <!-- Step 1 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 01</span> လက်ရှိ Server မှာ Domain တွေကို Nginx နဲ့ တွဲထားတာလား ဒါမှမဟုတ် Docker container ထဲကလားဆိုတာ အရင်စစ်ဆေးနည်း</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - check sites-enabled</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code">ls -l /etc/nginx/sites-enabled/</code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 02</span> လက်ရှိ အသုံးပြုနေတဲ့ Nginx configuration ဖိုင်ကို စစ်ဆေးနည်း</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - view nginx config</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-cat"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 03</span> Server ပေါ်ကနေ DNS ချိတ်ဆက်မှု အခြေအနေကို စစ်ဆေးဖို့အတွက် Command</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - ping new domains</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-ping"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 04</span> မပြင်ခင် လက်ရှိ configuration ဖိုင်ကို အရေးပေါ်ပြန်ယူနိုင်အောင် backup အရင်လုပ်နည်း</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - backup config</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-backup"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 05</span> Nginx config ဖိုင်ထဲက server_name နေရာမှာ Domain အသစ်ထပ်ထည့်နည်း</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - sed update server_name</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-sed"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 06</span> ဖိုင်ထဲမှာ စာသားတွေ နေရာတကျ မှန်ကန်စွာ ဝင်သွားခြင်း ရှိ/မရှိ ပြန်လည်စစ်ဆေးနည်း</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - verify server_name</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-grep"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 7 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 07</span> Nginx configuration syntax အမှားအယွင်း ရှိ/မရှိ စစ်ဆေးရန်</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - test nginx config</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code">sudo nginx -t</code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2><span class="step-badge">STEP 08</span> Nginx configuration အသစ်ကို အသက်သွင်းရန်</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - reload nginx</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code">sudo systemctl reload nginx</code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 9 -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 id="title-curl"><span class="step-badge">STEP 09</span> Domain အသစ်များကနေ HTTPS ဖြင့် ကောင်းမွန်စွာ ချိတ်ဆက်အလုပ်လုပ်ခြင်း ရှိ/မရှိ စစ်ဆေးရန်</h2>
+                </div>
+                <div class="cmd-box">
+                    <div class="cmd-box-header">
+                        <div class="window-controls">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="cmd-title">bash - curl https check</span>
+                        <button class="btn-copy-all" onclick="copyGroup(this)"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>
+                    <div class="cmd-list">
+                        <div class="cmd-item">
+                            <code class="cmd-code" id="cmd-curl"></code>
+                            <button class="btn-copy-line" onclick="copyLine(this)"><i class="far fa-clone"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Placeholder domains (No real domain names used)
+        let oldDomains = [
+            'old-panel.example.com',
+            'old-admin1.example.net',
+            'old-admin2.example.org'
+        ];
+
+        let newDomains = [
+            'new-sub1.sample.store',
+            'new-sub2.sample.store'
+        ];
+
+        // Escape HTML to prevent XSS when rendering inside code blocks
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[m];
+            });
+        }
+
+        // Render Dynamic Input Lists
+        function renderInputs() {
+            const oldContainer = document.getElementById('old-domains-list');
+            const newContainer = document.getElementById('new-domains-list');
+
+            oldContainer.innerHTML = oldDomains.map((val, idx) => `
+                <div class="domain-input-row">
+                    <span class="index-tag">#${idx + 1}</span>
+                    <input type="text" class="input-old" value="${escapeHtml(val)}" 
+                        placeholder="e.g. old-domain-${idx + 1}.example.com"
+                        oninput="updateDomainValue('old', ${idx}, this.value)">
+                    <button type="button" class="btn-remove" onclick="removeDomain('old', ${idx})" 
+                        ${oldDomains.length <= 1 ? 'disabled title="အနည်းဆုံး ၁ ခု ရှိရပါမည်"' : 'title="ဖျက်မည်"'}>
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            newContainer.innerHTML = newDomains.map((val, idx) => `
+                <div class="domain-input-row">
+                    <span class="index-tag">#${idx + 1}</span>
+                    <input type="text" class="input-new" value="${escapeHtml(val)}" 
+                        placeholder="e.g. new-sub-${idx + 1}.sample.store"
+                        oninput="updateDomainValue('new', ${idx}, this.value)">
+                    <button type="button" class="btn-remove" onclick="removeDomain('new', ${idx})" 
+                        ${newDomains.length <= 1 ? 'disabled title="အနည်းဆုံး ၁ ခု ရှိရပါမည်"' : 'title="ဖျက်မည်"'}>
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function updateDomainValue(type, index, value) {
+            if (type === 'old') {
+                oldDomains[index] = value.trim();
+            } else {
+                newDomains[index] = value.trim();
+            }
+            updateCommands();
+        }
+
+        function addDomain(type) {
+            if (type === 'old') {
+                oldDomains.push(`old-admin${oldDomains.length}.example.com`);
+            } else {
+                newDomains.push(`new-sub${newDomains.length + 1}.sample.store`);
+            }
+            renderInputs();
+            updateCommands();
+        }
+
+        function removeDomain(type, index) {
+            if (type === 'old' && oldDomains.length > 1) {
+                oldDomains.splice(index, 1);
+            } else if (type === 'new' && newDomains.length > 1) {
+                newDomains.splice(index, 1);
+            }
+            renderInputs();
+            updateCommands();
+        }
+
+        // Update all terminal commands dynamically
+        function updateCommands() {
+            const validOld = oldDomains.map((d, i) => d || `old_domain_${i + 1}`);
+            const validNew = newDomains.map((d, i) => d || `new_sub_domain_${i + 1}`);
+
+            const primaryConfigFile = escapeHtml(validOld[0]);
+
+            // Old & New domain HTML spans
+            const oldSpans = validOld.map(d => `<span class="dyn-old">${escapeHtml(d)}</span>`).join(' ');
+            const newSpans = validNew.map(d => `<span class="dyn-new">${escapeHtml(d)}</span>`).join(' ');
+
+            // Step 2: cat /etc/nginx/sites-available/old_domain
+            document.getElementById('cmd-cat').innerHTML = 
+                `cat /etc/nginx/sites-available/<span class="dyn-old">${primaryConfigFile}</span>`;
+
+            // Step 3: ping -c 2 new_sub_domain_1 && ping -c 2 new_sub_domain_2
+            const pingCmds = validNew.map(d => `ping -c 2 <span class="dyn-new">${escapeHtml(d)}</span>`).join(' && ');
+            document.getElementById('cmd-ping').innerHTML = pingCmds;
+
+            // Step 4: sudo cp /etc/nginx/sites-available/old_domain /etc/nginx/sites-available/old_domain.bak
+            document.getElementById('cmd-backup').innerHTML = 
+                `sudo cp /etc/nginx/sites-available/<span class="dyn-old">${primaryConfigFile}</span> /etc/nginx/sites-available/<span class="dyn-old">${primaryConfigFile}</span>.bak`;
+
+            // Step 5: sudo sed -i 's/server_name old...;/server_name old... new...;/g' /etc/nginx/sites-available/old_domain
+            document.getElementById('cmd-sed').innerHTML = 
+                `sudo sed -i 's/server_name ${oldSpans};/server_name ${oldSpans} ${newSpans};/g' /etc/nginx/sites-available/<span class="dyn-old">${primaryConfigFile}</span>`;
+
+            // Step 6: grep -n "server_name" /etc/nginx/sites-available/old_domain
+            document.getElementById('cmd-grep').innerHTML = 
+                `grep -n "server_name" /etc/nginx/sites-available/<span class="dyn-old">${primaryConfigFile}</span>`;
+
+            // Step 9 Header & curl command
+            const newDomainLabelList = validNew.map(d => `<span class="dyn-new">${escapeHtml(d)}</span>`).join(' နှင့် ');
+            document.getElementById('title-curl').innerHTML = 
+                `<span class="step-badge">STEP 09</span> Domain အသစ်များ (${newDomainLabelList}) ကနေ HTTPS ဖြင့် ကောင်းမွန်စွာ ချိတ်ဆက်အလုပ်လုပ်ခြင်း ရှိ/မရှိ စစ်ဆေးရန်`;
+
+            const curlCmds = validNew.map(d => `curl -I https://<span class="dyn-new">${escapeHtml(d)}</span>`).join(' && ');
+            document.getElementById('cmd-curl').innerHTML = curlCmds;
+        }
+
+        // Copy functionality
+        function writeToClipboard(text, btn, originalIconHtml) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = originalIconHtml;
+                    btn.classList.remove('copied');
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert("Copy လုပ်ရာတွင် အခက်အခဲရှိနေပါသည်။");
+            });
+        }
+
+        function copyLine(btn) {
+            const codeEl = btn.previousElementSibling; 
+            if (codeEl) {
+                let text = codeEl.innerText.trim();
+                writeToClipboard(text, btn, '<i class="far fa-clone"></i>');
+            }
+        }
+
+        function copyGroup(btn) {
+            const box = btn.closest('.cmd-box');
+            if (box) {
+                const codes = box.querySelectorAll('.cmd-code');
+                let combinedText = Array.from(codes)
+                    .map(el => el.innerText.trim())
+                    .filter(text => text.length > 0)
+                    .join('\n'); 
+                writeToClipboard(combinedText, btn, '<i class="fas fa-copy"></i> Copy All');
+            }
+        }
+
+        // Initialize on page load
+        renderInputs();
+        updateCommands();
+    </script>
+</body>
+</html>
